@@ -7,12 +7,13 @@ alwaysApply: true
 # Cursor Rule: Themis Shared AI Layer
 
 - **Shared State Directory:** `.agents/`
-- **Spec:** `docs/superpowers/specs/2026-09-21-project-rules-hardening-design.md`. Operational GRC: ADR-0006, ADR-0007, `docs/superpowers/specs/2026-09-21-database-schema-grc-core-design.md`.
+- **Spec:** `docs/superpowers/specs/2026-09-21-project-rules-hardening-design.md`. Operational GRC: ADR-0006 … ADR-0009, `docs/superpowers/specs/2026-09-21-database-schema-grc-core-design.md`.
 - **Core Guidelines:** Clean Architecture, S.O.L.I.D., and Clean Code in `.agents/rules/` (`00`, `02`, `03`, `04`, `06`).
 - **Workspaces:** `apps/iris` (TanStack Start host), `apps/olympus` (NestJS), `packages/nomos` (Zod contracts).
 - **UI & Aesthetics:** `impeccable` and `web-design-guidelines`. Avoid generic AI styling.
 - **UI layers:** Routes are dumb; feature components are smart; `shared/ui` primitives are dumb. Custom hooks live in `hooks/` folders. React files ≤ 150 Prettier lines.
 - **State Separation:** Server interactions belong exclusively in TanStack Query (`ky` only inside feature `api/`). Zustand is for UI machines only — never a server cache or optimistic API writes. Filters belong in URL params.
-- **Naming:** Greek for apps/packages/modules/features; English GRC for entities, copy, and URLs.
+- **Naming:** Greek for apps/packages/modules/features; English GRC for code identifiers; Spanish (`es-MX`) for copy and URLs (ADR-0009).
+- **Auth:** Better Auth (ADR-0008). Authorization: membership + assignment, not Oso (ADR-0007).
 - **Skills:** Loaded directly from `.agents/skills/`. View transitions via TanStack Router, not Next.js.
 - **Coordination:** Respect task locks in `.agents/tasks/locks/`.

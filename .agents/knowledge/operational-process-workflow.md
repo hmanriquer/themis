@@ -70,4 +70,6 @@ A process with zero controls must not auto-approve.
 
 ## 4. Migration
 
-Migration is a **new version row** (`version + 1`, same `familyId`, `migratedFromId` set). The operator may change name and/or liable and must choose a copy scope. Copied controls return to `PENDING_APPROVAL`. The source row becomes `MIGRATED` and remains in the lineage log.
+Migration is a **new version row** (`version + 1`, same `familyId`, `migratedFromId` set). Codes on the new row are **new** (`PROC-00N`, not reused). Copied risks/controls get new `RISK-` / `CTRL-` codes. Copied controls return to `PENDING_APPROVAL`. The source row becomes `MIGRATED` and remains in the lineage log.
+
+Product copy is Spanish (`es-MX`). Process overall grade uses banker's rounding (ADR-0009).

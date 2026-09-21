@@ -1,7 +1,7 @@
 # ADR-0007: Authorization — Company Membership + Process Assignment (Not Oso)
 
 ## Status
-Accepted
+Accepted (amended 2026-09-21: identity provider is Better Auth, ADR-0008)
 
 ## Date
 2026-09-21
@@ -21,7 +21,7 @@ Oso Polar / Oso Cloud, OpenFGA, and SpiceDB would add a second policy language a
 
 ### Identity vs authorization
 - **`User`:** identity only (`email`, `fullName`, `isActive`). No `User.role = LIABLE`. No single `User.companyId`.
-- **Authentication** (how they sign in) is a later choice (Better Auth or Nest session/JWT). This ADR does not pick the identity provider.
+- **Authentication** is **Better Auth** (ADR-0008). This ADR covers authorization only.
 
 ### Authorization tables
 1. **`CompanyMembership`** `(userId, companyId, role)`
@@ -59,7 +59,7 @@ Revisit ReBAC (Oso / OpenFGA) only if process trees, delegation chains, or cross
 
 ### Negative
 - Permission changes require a code/review cycle instead of a Polar file.
-- Identity provider is still undecided; do not put passwords on `User` until that ADR exists.
+- Passwords stay in Better Auth (ADR-0008), not on a hand-rolled `User.password` column.
 
 ### Neutral
 - `ProcessViewer` in the draft Prisma dump is superseded by `ProcessAssignment`.

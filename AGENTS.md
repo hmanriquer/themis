@@ -12,7 +12,7 @@ All 4 AI agents operate under a shared, centralized repository structure located
 
 Canonical architecture spec: `[docs/superpowers/specs/2026-09-21-project-rules-hardening-design.md](file:///home/grillo/development/themis/docs/superpowers/specs/2026-09-21-project-rules-hardening-design.md)`.
 
-Operational process-risk (v1): `[ADR-0006](file:///home/grillo/development/themis/.agents/decisions/ADR-0006-operational-process-risk-postgres.md)`, `[ADR-0007](file:///home/grillo/development/themis/.agents/decisions/ADR-0007-authorization-membership-not-oso.md)`, spec `[2026-09-21-database-schema-grc-core-design.md](file:///home/grillo/development/themis/docs/superpowers/specs/2026-09-21-database-schema-grc-core-design.md)`, workflow `[operational-process-workflow.md](file:///home/grillo/development/themis/.agents/knowledge/operational-process-workflow.md)`.
+Operational process-risk (v1): `[ADR-0006](file:///home/grillo/development/themis/.agents/decisions/ADR-0006-operational-process-risk-postgres.md)` … `[ADR-0009](file:///home/grillo/development/themis/.agents/decisions/ADR-0009-spanish-codes-bankers-rounding.md)`, spec `[2026-09-21-database-schema-grc-core-design.md](file:///home/grillo/development/themis/docs/superpowers/specs/2026-09-21-database-schema-grc-core-design.md)`, workflow `[operational-process-workflow.md](file:///home/grillo/development/themis/.agents/knowledge/operational-process-workflow.md)`.
 
 ---
 
@@ -45,7 +45,7 @@ themis/
     │   └── 06-backend-nestjs.md
     ├── hooks/
     ├── personas/
-    ├── decisions/                 <-- ADR-0001 … ADR-0007
+    ├── decisions/                 <-- ADR-0001 … ADR-0009
     ├── docs/
     ├── knowledge/
     ├── tasks/
@@ -91,7 +91,11 @@ Dependencies point **strictly inward**:
 
 ### Naming
 - **Greek:** apps, packages, Nest modules, `iris` feature folders (`dike`, `prometheus`, `astraea`, `argus`, `hermes`, `mnemosyne`).
-- **English GRC:** entities, copy, URLs (`/compliance`, `/risks`).
+- **English GRC:** TypeScript/Prisma identifiers (`Process`, `Risk`, `Control`).
+- **Spanish (`es-MX`):** all user-facing copy and URL paths (`/procesos`, `/riesgos`, `/cumplimiento`). ADR-0009.
+
+### Authentication
+- **Better Auth** on `olympus` (ADR-0008). Authorization remains membership + process assignment (ADR-0007), not Oso.
 
 ---
 

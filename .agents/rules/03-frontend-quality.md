@@ -54,7 +54,7 @@ Stack ADR: `.agents/decisions/ADR-0005-frontend-tanstack-start-ky-zod.md`.
 
 *   **Compound Components:** Decompose complex UI controls (`<DikeMatrix>`, `<DikeMatrix.Header>`, `<DikeMatrix.Row>`).
 *   **Slot Pattern (`asChild`):** Radix / Base UI slots so styling can swap without extra DOM nodes.
-*   Feature folder names are Greek; visible labels and routes stay English GRC (`Compliance`, `/compliance`).
+*   Feature folder names are Greek; visible labels and routes are Spanish (`Cumplimiento`, `/cumplimiento`). Identifiers stay English GRC. See ADR-0009.
 
 ---
 

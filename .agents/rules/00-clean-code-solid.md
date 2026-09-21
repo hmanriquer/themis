@@ -52,7 +52,7 @@ Canonical design: `docs/superpowers/specs/2026-09-21-project-rules-hardening-des
     *   Functions & methods: active verbs (e.g., `calculateRiskIndex()`, `verifyAuditSignature()`, `isEvidenceCompliant()`).
     *   Booleans: prefixes like `is`, `has`, `should`, `can` (e.g., `isAudited`, `hasActiveViolation`).
 *   Avoid abbreviations, cryptic acronyms, or Hungarian notation.
-*   **Greek vs English:** Apps, packages, Nest modules, and `iris` feature folders use pantheon names (`dike`, `prometheus`). Domain entities, use cases, UI copy, and URLs use English GRC terms (`Control`, `/risks`). See ADR-0004.
+*   **Greek vs English vs Spanish:** Apps, packages, Nest modules, and `iris` feature folders use pantheon names (`dike`, `prometheus`). Domain entities and use cases use English GRC identifiers (`Control`, `AssessRisk`). User-facing copy and URL paths are Spanish (`es-MX`, `/riesgos`). See ADR-0004 and ADR-0009.
 
 ### Functions & Methods
 *   **Small & Focused:** Ideal length under 25 lines. A function should do one thing and do it well.

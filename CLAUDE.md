@@ -12,4 +12,4 @@ Welcome! In this repository, all engineering guidelines, multi-AI coordination p
 4. **Skills:** Discovered natively from `.agents/skills/`. Do not look for a project `.claude/skills` copy.
 5. **Task Locking:** Run `.agents/hooks/pre-task.sh <TASK_ID> <AGENT_NAME>` before editing files.
 6. **Memory:** Read `.agents/memory/index.md` and check `.agents/memory/observations.jsonl`.
-7. **Spec:** `docs/superpowers/specs/2026-09-21-project-rules-hardening-design.md`. Operational GRC: ADR-0006, ADR-0007.
+7. **Spec:** `docs/superpowers/specs/2026-09-21-project-rules-hardening-design.md`. Operational GRC: ADR-0006 … ADR-0009.

@@ -42,7 +42,7 @@ YAGNI: do not add `@themis/ui` or `@themis/domain` until a second consumer exist
 
 *   **Responsibility:** Enterprise business rules and GRC concepts. Completely independent of frameworks, UI, and external libraries.
 *   **Contents:**
-    *   **Entities:** Objects with identity and lifecycle (`Risk`, `Control`, `Evidence`, `AuditAssessment`). English GRC names, not pantheon names.
+    *   **Entities:** Objects with identity and lifecycle (`Risk`, `Control`, `Evidence`, `AuditAssessment`). English GRC **identifiers**, not pantheon names. User-facing labels are Spanish (ADR-0009).
     *   **Value Objects:** Immutable (`RiskScore`, `ControlCode`, `ComplianceStatus`, `EvidenceHash`).
     *   **Domain Events:** `RiskExceededThresholdEvent`, `ControlFailedAuditEvent`.
     *   **Repository Interfaces:** Ports (`IRiskRepository`, `IControlRepository`).

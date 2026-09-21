@@ -12,7 +12,7 @@ This board coordinates active, backlog, and completed development tasks across a
 | **Ready for Work** | 1 |
 | **In Progress** | 0 |
 | **In Review / Verification** | 0 |
-| **Completed** | 5 |
+| **Completed** | 6 |
 
 ---
 
@@ -53,6 +53,11 @@ This board coordinates active, backlog, and completed development tasks across a
 ---
 
 ## 4. Completed
+
+- [x] `TASK-011`: **Product locale, codes, Better Auth, banker's rounding**
+  - **Owner:** Cursor
+  - **Date Completed:** 2026-09-21
+  - **Outcome:** ADR-0008 (Better Auth), ADR-0009 (Spanish `es-MX` UI/URLs, `PROC-001`/`CTRL-001`/`RISK-001`, round-half-to-even). Cascaded into ADR-0004/0006/0007, rules, DESIGN.md, spec, memory.
 
 - [x] `TASK-010`: **Record Operational Process-Risk & Authorization Decisions**
   - **Owner:** Cursor

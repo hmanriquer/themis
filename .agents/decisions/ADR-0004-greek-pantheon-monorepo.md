@@ -1,7 +1,7 @@
 # ADR-0004: Greek Pantheon Monorepo Topology
 
 ## Status
-Accepted
+Accepted (amended 2026-09-21: Spanish product surface, ADR-0009)
 
 ## Date
 2026-09-21
@@ -16,7 +16,8 @@ Themis is named for the Titaness of divine law. A single Vite app with `src/doma
 4. **Pantheon modules** (Nest modules and matching `iris` features): `dike` (compliance), `prometheus` (risk), `astraea` (audit ledger), `argus` (evidence telemetry), `hermes` (notifications), `mnemosyne` (evidence repository).
 5. **Naming split:**
    - Greek: app, package, Nest module, and `iris` feature folder names.
-   - English GRC: domain entities, use cases, UI copy, and URL paths (`/compliance`, `/risks`, `/evidence`, `/audit`).
+   - English GRC: domain entities, use cases, and TypeScript/Prisma identifiers (`Process`, `Risk`, `Control`).
+   - Spanish (`es-MX`): all user-facing copy and `iris` URL paths (`/procesos`, `/riesgos`, `/cumplimiento`). See ADR-0009. This amends the earlier English-copy rule.
 6. **YAGNI:** No `@themis/ui`, `@themis/domain`, Turborepo, or OpenAPI generation until a second consumer exists.
 
 Workspace scaffolding is a follow-on implementation task. This ADR locks the names and boundaries.

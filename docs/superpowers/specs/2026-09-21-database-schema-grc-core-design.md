@@ -6,7 +6,7 @@
 **Reviewer:** Cursor  
 **Collaborating AIs:** Codex, OpenCode, Cursor, Antigravity  
 
-**Recorded decisions:** [ADR-0006](file:///home/grillo/development/themis/.agents/decisions/ADR-0006-operational-process-risk-postgres.md) (PostgreSQL + Prisma, lifecycle, heatmap), [ADR-0007](file:///home/grillo/development/themis/.agents/decisions/ADR-0007-authorization-membership-not-oso.md) (membership + process assignment; not Oso). Workflow: [`.agents/knowledge/operational-process-workflow.md`](file:///home/grillo/development/themis/.agents/knowledge/operational-process-workflow.md).  
+**Recorded decisions:** [ADR-0006](file:///home/grillo/development/themis/.agents/decisions/ADR-0006-operational-process-risk-postgres.md), [ADR-0007](file:///home/grillo/development/themis/.agents/decisions/ADR-0007-authorization-membership-not-oso.md), [ADR-0008](file:///home/grillo/development/themis/.agents/decisions/ADR-0008-better-auth.md) (Better Auth), [ADR-0009](file:///home/grillo/development/themis/.agents/decisions/ADR-0009-spanish-codes-bankers-rounding.md) (Spanish UI, `PROC-001` / `CTRL-001` / `RISK-001`, banker's rounding). Workflow: [`.agents/knowledge/operational-process-workflow.md`](file:///home/grillo/development/themis/.agents/knowledge/operational-process-workflow.md).  
 
 ---
 
@@ -73,14 +73,17 @@ stateDiagram-v2
   APPROVED --> EXPIRED: expiresAt passed
 ```
 
-**Locked invariants (ADR-0006):**
+**Locked invariants (ADR-0006 / ADR-0009):**
 - Vacuous approval is forbidden: zero controls must not close the process.
 - New risk grades derive from the heatmap. Canonical cell **poco frecuente × bajo → Insignificante**. Store grade; do not overwrite historic outliers.
+- Business codes: `PROC-001`, `CTRL-001`, `RISK-001` (zero-padded ≥3 digits, immutable, assigned by Olympus).
+- Process grade uses banker's rounding on the mean.
+- Product copy and iris paths are Spanish (`es-MX`).
 - Migration inserts a new version row (`familyId` stable). Copied controls reset to `PENDING_APPROVAL`.
 - UI timeline ≠ Astraea hash-chain ledger. Both are written on every transition.
 - Dashboard v1: counts by `isLosable` × month(`assessedAt`) × company. Not invented MXN midpoints.
 
-**Locked authorization (ADR-0007):** `User` is identity only. `CompanyMembership` + `ProcessAssignment` (exactly one `LIABLE`). Sub-liables cannot approve. **Not Oso / OpenFGA / SpiceDB.**
+**Locked authorization (ADR-0007 / ADR-0008):** `User` is identity only (Better Auth). `CompanyMembership` + `ProcessAssignment` (exactly one `LIABLE`). Sub-liables cannot approve. **Not Oso / OpenFGA / SpiceDB.**
 
 ---
 
@@ -144,7 +147,7 @@ To support the hierarchical categories found in historical data (e.g., *Ejecuci�
 
 ### 3.3 Process Aggregate (`Process`)
 - `id`: UUID (Primary Key).
-- `code`: String (Unique business identifier, e.g., `PROC-PR-2026-001`).
+- `code`: String (Unique business identifier, e.g., `PROC-001`). See ADR-0009.
 - `name`: String.
 - `companyId`: UUID (FK to `Company`).
 - `areaId`: UUID (FK to `Area`).
@@ -287,7 +290,9 @@ Calculated automatically when a Risk is saved:
 When all controls are approved, the overall process grade is calculated as the rounded arithmetic mean of individual risk grades:
 $$\text{NumericGrade}(g) = \begin{cases} 1 & \text{INSIGNIFICANT} \\ 2 & \text{LOW} \\ 3 & \text{MEDIUM} \\ 4 & \text{HIGH} \\ 5 & \text{CRITICAL} \end{cases}$$
 $$\text{MeanScore} = \frac{1}{N} \sum_{i=1}^N \text{NumericGrade}(r_i.\text{grade})$$
-$$\text{OverallProcessGrade} = \text{GradeFromNumeric}(\text{round}(\text{MeanScore}))$$
+$$\text{OverallProcessGrade} = \text{GradeFromNumeric}(\text{bankersRound}(\text{MeanScore}))$$
+
+`bankersRound` is round-half-to-even (ADR-0009). Example: `2.5 → 2` (LOW), `3.5 → 4` (HIGH).
 
 A process with zero risks or zero controls cannot reach `APPROVED`.
 

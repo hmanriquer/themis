@@ -31,7 +31,7 @@ Persistence was already chosen: PostgreSQL with Prisma on NestJS (`olympus`).
    | `APPROVED` / `MIGRATED` / `EXPIRED` | writes | Forbidden except viewer grants and append-only logs |
 
 5. **Heatmap:** New assessments derive `Risk.grade` from `(frequency, severity)`. Canonical cell **poco frecuente × bajo → Insignificante**. Store grade on the row so historic outliers can be imported unchanged. Do not overwrite seeded grades.
-6. **Process grade:** Rounded arithmetic mean of member risk grades (empty-risk process cannot close).
+6. **Process grade:** Arithmetic mean of member risk grades, then **banker's rounding** (round half to even) before mapping back to `RiskGrade` (ADR-0009). Empty-risk process cannot close.
 7. **Migration copy scope:** `FULL` | `ONLY_RISKS` | `ONLY_CONTROLS` | `METADATA_ONLY`. Copied controls reset to `PENDING_APPROVAL`. Old process becomes `MIGRATED` and stays readable.
 8. **Taxonomy:** Adjacency list of unbounded depth. A risk points at a **leaf** (node with no children), not `level === 3`. Historic paths range from depth 1 to 6.
 9. **Two logs:**

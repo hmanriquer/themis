@@ -14,4 +14,4 @@ ALL rules, skills, personas, ADRs, documentation, domain knowledge, tasks, logs,
 6. **Skills:** `.agents/skills/`. Use `impeccable`, `web-design-guidelines`, `shadcn`, `zustand` (Themis override: no optimistic API writes in stores), `tanstack-query`, `react-doctor`. Adapt view-transition recipes to TanStack Router — do not copy Next.js APIs.
 7. **Task Coordination:** Check `.agents/tasks/board.md`. Run `.agents/hooks/pre-task.sh <TASK_ID> Cursor` before edits. Run `.agents/hooks/post-task.sh <TASK_ID> Cursor` when complete.
 8. **Memory:** `.agents/memory/index.md` and `.agents/memory/memory-helper.sh search "<query>"`.
-9. **Spec:** `docs/superpowers/specs/2026-09-21-project-rules-hardening-design.md`. Operational GRC: ADR-0006, ADR-0007, `docs/superpowers/specs/2026-09-21-database-schema-grc-core-design.md`.
+9. **Spec:** `docs/superpowers/specs/2026-09-21-project-rules-hardening-design.md`. Operational GRC: ADR-0006 … ADR-0009, `docs/superpowers/specs/2026-09-21-database-schema-grc-core-design.md`.

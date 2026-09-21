@@ -64,7 +64,7 @@ YAGNI: do not add `@themis/ui`, `@themis/domain`, Turborepo, XState, or OpenAPI 
 | :--- | :--- | :--- |
 | Apps, packages, Nest modules, `iris` feature folders | Greek | `iris`, `olympus`, `nomos`, `dike`, `prometheus` |
 | Domain entities, value objects, use case names | English GRC | `Control`, `Risk`, `Evidence`, `AssessRisk` |
-| User-facing copy and URL paths | English GRC | `/compliance`, `/risks`, `/evidence`, `/audit` |
+| User-facing copy and URL paths | Spanish `es-MX` | `/procesos`, `/riesgos`, `/evidencia`, `/auditoria` |
 
 Never name a domain entity `Dike` or a public route `/prometheus`.
 
@@ -323,7 +323,7 @@ Workspace scaffolding (`pnpm-workspace.yaml`, `apps/iris`, `apps/olympus`, `pack
 - [x] Start server functions are forbidden for GRC business logic.
 - [x] Zustand is for UI state and explicit machines, never server cache or optimistic API writes.
 - [x] NestJS keeps native DI and a Nest-idiomatic module template.
-- [x] Greek names for apps/packages/modules; English GRC for entities, copy, and URLs.
+- [x] Greek names for apps/packages/modules; English GRC identifiers; Spanish copy and URLs (ADR-0009).
 - [x] 150-line React cap, composition, and ESLint/CI enforcement are specified.
 - [x] Tests colocate with units; feature `tests/` is integration-only; E2E stays at the app.
 - [x] `DESIGN.md`, ADR-0002, ADR-0003, testing rules, and bridges are in the hardening set.

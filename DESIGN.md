@@ -67,7 +67,10 @@ Decisions: [ADR-0006](file:///home/grillo/development/themis/.agents/decisions/A
 *   **Identity / auth:** `User` (identity only), `CompanyMembership`, `ProcessAssignment` (exactly one liable per process). Not Oso.
 *   **Persistence:** PostgreSQL + Prisma in `olympus` infrastructure.
 *   **Heatmap:** `(frequency, severity) → grade`. Canonical cell poco frecuente × bajo = Insignificante. Grade is stored.
-*   **Process grade:** Rounded mean of member risk grades. Cannot close with zero controls.
+*   **Process grade:** Mean of member risk grades with **banker's rounding** (ADR-0009). Cannot close with zero controls.
+*   **Codes:** `PROC-001`, `CTRL-001`, `RISK-001` (ADR-0009).
+*   **Copy / URLs:** Spanish `es-MX` (`/procesos`, `/riesgos`). Code identifiers stay English GRC.
+*   **AuthN:** Better Auth on Olympus (ADR-0008).
 *   **Logs:** UI `ProcessTimelineEvent` plus Astraea hash-chain `AuditEvent`.
 *   **Migration:** New version row, same `familyId`. Copy scope `FULL` | `ONLY_RISKS` | `ONLY_CONTROLS` | `METADATA_ONLY`.
 
@@ -169,6 +172,8 @@ Not the operational heatmap. Operational risk uses the qualitative 5×5 matrix i
 | **Icons** | Lucide React | Clean, consistent enterprise icon system |
 | **Database** | PostgreSQL + Prisma (Nest provider) | Operational process-risk + RCOP money amounts (ADR-0006) |
 | **Authorization** | Nest Guard + `CompanyMembership` / `ProcessAssignment` | Built-in RBAC; not Oso (ADR-0007) |
+| **Authentication** | Better Auth (Olympus + iris client) | Sessions via HTTP-only cookie (ADR-0008) |
+| **Locale** | Spanish `es-MX` | User-facing copy and URLs (ADR-0009) |
 | **Cryptography** | Web Crypto API (SHA-256) | Built-in browser and Node native cryptographic security |
 | **Testing** | Vitest + React Testing Library + Nest testing | Colocated unit tests; feature `tests/` for integration |
 | **Health Auditing**| Million.co React Doctor | Continuous component and bundle health tracking |

@@ -56,7 +56,7 @@ Shared domain needed by two modules stays in `olympus` (or a later package). It 
 *   Path strings come from `@themis/nomos` constants — no magic strings.
 *   Controllers return DTOs that match `nomos` Zod response schemas.
 *   Persistence is **PostgreSQL + Prisma** (ADR-0006), registered as Nest providers in `infrastructure/`. Domain folders stay Prisma-free.
-*   Authorization libraries (Oso, OpenFGA) are **out of scope**. Use Nest Guards plus a policy function (ADR-0007). Identity provider (Better Auth vs Nest JWT) is still undecided.
+*   Authorization libraries (Oso, OpenFGA) are **out of scope**. Use Nest Guards plus a policy function (ADR-0007). Authentication is **Better Auth** on Olympus (ADR-0008).
 
 ---
 

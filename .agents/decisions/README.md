@@ -18,3 +18,5 @@ Every decision must follow the standard MADR / Nygard format:
 - [ADR-0005: TanStack Start, ky, Zod, Query, and Zustand](file:///home/grillo/development/themis/.agents/decisions/ADR-0005-frontend-tanstack-start-ky-zod.md)
 - [ADR-0006: Operational Process-Risk Bounded Context (PostgreSQL + Prisma)](file:///home/grillo/development/themis/.agents/decisions/ADR-0006-operational-process-risk-postgres.md)
 - [ADR-0007: Authorization — Company Membership + Process Assignment (Not Oso)](file:///home/grillo/development/themis/.agents/decisions/ADR-0007-authorization-membership-not-oso.md)
+- [ADR-0008: Authentication with Better Auth](file:///home/grillo/development/themis/.agents/decisions/ADR-0008-better-auth.md)
+- [ADR-0009: Spanish Product Surface, Entity Codes, Banker's Rounding](file:///home/grillo/development/themis/.agents/decisions/ADR-0009-spanish-codes-bankers-rounding.md)
