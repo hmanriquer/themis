@@ -57,7 +57,36 @@ Pantheon modules (Greek folders, English GRC entities): `dike` (compliance), `pr
 
 ## 3. Core Domain Models & Business Logic
 
-### 3.1 Compliance Framework Aggregate
+v1 implements **operational process-risk** (`prometheus`). ISO/SOC 2 framework catalogs (`dike`) remain a later phase. Do not mix the two `Control` types.
+
+Decisions: [ADR-0006](file:///home/grillo/development/themis/.agents/decisions/ADR-0006-operational-process-risk-postgres.md) (data + lifecycle), [ADR-0007](file:///home/grillo/development/themis/.agents/decisions/ADR-0007-authorization-membership-not-oso.md) (auth). Workflow diagram: [`.agents/knowledge/operational-process-workflow.md`](file:///home/grillo/development/themis/.agents/knowledge/operational-process-workflow.md). Spec: [`docs/superpowers/specs/2026-09-21-database-schema-grc-core-design.md`](file:///home/grillo/development/themis/docs/superpowers/specs/2026-09-21-database-schema-grc-core-design.md).
+
+### 3.0 Operational Process Aggregate (v1)
+
+*   **Entities:** `Process` (aggregate root), `Risk`, operational `Control`, `TaxonomyNode`, `Meeting`, `Company`, `Area`, `CompanyCapitalRequirement`.
+*   **Identity / auth:** `User` (identity only), `CompanyMembership`, `ProcessAssignment` (exactly one liable per process). Not Oso.
+*   **Persistence:** PostgreSQL + Prisma in `olympus` infrastructure.
+*   **Heatmap:** `(frequency, severity) → grade`. Canonical cell poco frecuente × bajo = Insignificante. Grade is stored.
+*   **Process grade:** Rounded mean of member risk grades. Cannot close with zero controls.
+*   **Logs:** UI `ProcessTimelineEvent` plus Astraea hash-chain `AuditEvent`.
+*   **Migration:** New version row, same `familyId`. Copy scope `FULL` | `ONLY_RISKS` | `ONLY_CONTROLS` | `METADATA_ONLY`.
+
+```mermaid
+flowchart TD
+  create["Create process"] --> notify["Notify liable"]
+  notify --> meeting["Kickoff meeting"]
+  meeting --> risks["Identify N risks"]
+  risks --> controls["Propose controls"]
+  controls --> review["Liable review"]
+  review -->|"changes requested"| controls
+  review -->|"all approved"| close["Process APPROVED"]
+  close --> visible["Liable + sub-liables read"]
+  visible --> migrate["Migrate new version"]
+  visible --> expire["EXPIRED"]
+  migrate --> create
+```
+
+### 3.1 Compliance Framework Aggregate (later — Dike)
 *   **Entities:** `Framework`, `Section`, `ControlRequirement`.
 *   **Standards Covered:**
     *   *ISO/IEC 27001:2022* (Organizational, People, Physical, Technological)
@@ -66,7 +95,7 @@ Pantheon modules (Greek folders, English GRC entities): `dike` (compliance), `pr
     *   *HIPAA Security Rule* (§164.308, §164.310, §164.312)
     *   *GDPR* (Articles 25, 30, 32, 33, 34)
 
-### 3.2 Unified Control Entity
+### 3.2 Unified Framework Control Entity *(Dike — later)*
 *   `Control`:
     *   `id`: UUID
     *   `code`: ValueObject (e.g. `CTRL-IAM-01`)
@@ -77,7 +106,8 @@ Pantheon modules (Greek folders, English GRC entities): `dike` (compliance), `pr
     *   `testFrequency`: `CONTINUOUS` | `WEEKLY` | `MONTHLY` | `ANNUAL`
     *   `assignedOwner`: `UserReference`
 
-### 3.3 Risk Assessment Model
+### 3.3 Residual Risk Model *(Dike — later)*
+Not the operational heatmap. Operational risk uses the qualitative 5×5 matrix in ADR-0006. This 1..25 score stays for framework residual risk when Dike lands.
 *   **Formula:**
     $$\text{Inherent Score} = \text{Likelihood}\,(1..5) \times \text{Impact}\,(1..5) \in [1..25]$$
     $$\text{Mitigation Factor} = \sum (\text{Control Effectiveness} \times \text{Control Weight}) \in [0.0..1.0]$$
@@ -137,6 +167,8 @@ Pantheon modules (Greek folders, English GRC entities): `dike` (compliance), `pr
 | **Client State** | Zustand v5 | UI machines only — never a server cache |
 | **Animation** | `@vercel/react-view-transitions` + TanStack Router | Native View Transitions API support |
 | **Icons** | Lucide React | Clean, consistent enterprise icon system |
+| **Database** | PostgreSQL + Prisma (Nest provider) | Operational process-risk + RCOP money amounts (ADR-0006) |
+| **Authorization** | Nest Guard + `CompanyMembership` / `ProcessAssignment` | Built-in RBAC; not Oso (ADR-0007) |
 | **Cryptography** | Web Crypto API (SHA-256) | Built-in browser and Node native cryptographic security |
 | **Testing** | Vitest + React Testing Library + Nest testing | Colocated unit tests; feature `tests/` for integration |
 | **Health Auditing**| Million.co React Doctor | Continuous component and bundle health tracking |
@@ -151,9 +183,9 @@ Pantheon modules (Greek folders, English GRC entities): `dike` (compliance), `pr
     *   Scaffolded `AGENTS.md`, `GEMINI.md`, and `DESIGN.md`.
 2.  **Phase 1b: Project Rules Hardening** *(Completed)*
     *   Locked `iris` / `olympus` / `nomos`, feature-based frontend, Nest module template, Query-only interactions, 150-line cap, test colocation. Spec: `docs/superpowers/specs/2026-09-21-project-rules-hardening-design.md`.
-3.  **Phase 2: Workspace Scaffolding & Core Domain Model**
+3.  **Phase 2: Workspace Scaffolding & Operational Domain Model**
     *   pnpm workspaces, TanStack Start `iris`, NestJS `olympus`, `@themis/nomos`.
-    *   Implement Framework, Control, Risk, Evidence, and Audit entities in `olympus` `domain/` with 100% test coverage.
+    *   Implement Process, Risk, operational Control, taxonomy, membership, and assignment in `olympus` `domain/` per ADR-0006 / ADR-0007. Framework/Evidence entities follow in Dike/Mnemosyne.
 4.  **Phase 3: Cryptographic Audit Engine & Storage Adapters**
     *   WebCrypto SHA-256 hash chaining and tamper-detection algorithm in `astraea`.
 5.  **Phase 4: Design System & Component Library**

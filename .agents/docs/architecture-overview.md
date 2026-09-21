@@ -39,14 +39,20 @@ Themis is an enterprise-grade Governance, Risk, and Compliance (GRC) platform en
 
 ## 2. Core Domain Models
 
-1.  **Compliance Framework:**
-    *   *Examples:* ISO 27001:2022, SOC 2 Type II, NIST CSF 2.0, HIPAA Security Rule, GDPR.
-    *   *Attributes:* ID, standard code, title, version, domains/sections, control collection.
-2.  **Control:**
-    *   *Attributes:* Code (e.g. `AC-1`, `A.5.1`, `CC6.1`), title, description, category, implementation status (`Implemented`, `Partially Implemented`, `Not Implemented`, `Not Applicable`), criticality (`Low`, `Medium`, `High`, `Critical`), assigned owner.
-3.  **Risk:**
-    *   *Attributes:* ID, title, threat description, category, inherent impact ($1..5$), inherent likelihood ($1..5$), inherent score, mapped controls, residual impact, residual likelihood, residual score, status (`Open`, `Mitigated`, `Accepted`, `Transferred`).
-4.  **Evidence:**
-    *   *Attributes:* ID, controlId, title, storageUri, mimeType, sha256Checksum, collectionTimestamp, validUntil, verificationStatus (`Valid`, `Expired`, `Tampered`).
-5.  **Audit Event:**
-    *   *Attributes:* ID, sequenceNumber, timestamp, actorId, actionType, entityType, entityId, payloadDiff, previousHash, recordHash (SHA-256 chain).
+v1 is operational process-risk (ADR-0006). Framework catalogs are a later Dike phase.
+
+1.  **Process (aggregate root):**
+    *   Company, area, `familyId` / version / `migratedFromId`, `assessedAt`, `expiresAt`, status machine (`DRAFT` → `IN_REVIEW` → `PENDING_APPROVAL` → `APPROVED` → `MIGRATED` | `EXPIRED`).
+    *   Exactly one liable via `ProcessAssignment`. Sub-liables may read, not approve (ADR-0007).
+2.  **Operational Risk:**
+    *   Frequency, severity, stored grade (5×5 heatmap), `isLosable`, taxonomy leaf (unbounded depth).
+3.  **Operational Control:**
+    *   Frequency, approval status, M:N mitigations, change-request thread with mandatory liable comment.
+4.  **CompanyCapitalRequirement:**
+    *   Yearly RCOP and absolute MXN severity bands per company.
+5.  **Compliance Framework** *(later — Dike):*
+    *   ISO 27001, SOC 2, NIST CSF, HIPAA, GDPR control catalogs. Distinct from operational controls.
+6.  **Evidence** *(later — Mnemosyne):*
+    *   ID, controlId, title, storageUri, mimeType, sha256Checksum, collectionTimestamp, validUntil, verificationStatus.
+7.  **Audit Event (Astraea):**
+    *   ID, sequenceNumber, timestamp, actorId, actionType, entityType, entityId, payloadDiff, previousHash, recordHash (SHA-256 chain). Separate from the process UI timeline.

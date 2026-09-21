@@ -1,9 +1,12 @@
 # Design Specification: GRC Core Database Schema & Domain Data Model
 
 **Date:** 2026-09-21  
-**Status:** In Review  
+**Status:** Accepted (Cursor review 2026-09-21; Prisma dump in §5 is illustrative — ADR-0006 / ADR-0007 win on conflict)  
 **Architect:** Antigravity (Lead Systems Architect)  
+**Reviewer:** Cursor  
 **Collaborating AIs:** Codex, OpenCode, Cursor, Antigravity  
+
+**Recorded decisions:** [ADR-0006](file:///home/grillo/development/themis/.agents/decisions/ADR-0006-operational-process-risk-postgres.md) (PostgreSQL + Prisma, lifecycle, heatmap), [ADR-0007](file:///home/grillo/development/themis/.agents/decisions/ADR-0007-authorization-membership-not-oso.md) (membership + process assignment; not Oso). Workflow: [`.agents/knowledge/operational-process-workflow.md`](file:///home/grillo/development/themis/.agents/knowledge/operational-process-workflow.md).  
 
 ---
 
@@ -13,10 +16,10 @@ Themis requires a robust relational database schema and domain model in PostgreS
 
 ### 1.1 Context & Inputs
 1. **Legacy Flat Dataset (`historic(in).csv`)**:
-   - 1,352 historical risk-control assessments across 263 unique processes.
+   - 1,352 historical risk-control assessments across **264** unique `(name, company)` processes (263 distinct names).
    - 3 Operating Companies: `General de Salud` (GSA), `General de Seguros` (GSE), and `Reaseguradora Patria` (PR).
-   - 66 Functional Areas and 62 Liable Process Owners.
-   - Hierarchical operational risk taxonomy (Category / Subcategory / Leaf).
+   - **79** unique `(company, area)` pairs and 62 liable names (**6 people span two companies**).
+   - Hierarchical operational risk taxonomy of **unbounded depth** (historic paths: 1–6 segments). A risk points at a leaf node (no children), not `level === 3`.
    - Classification flags: `lost` (0 = non-losable operational/compliance risk; 1 = losable financial risk).
    - Frequency scale (`rara`, `poco frecuente`, `frecuente`, `muy frecuente`, `casi cierta`).
    - Severity scale (`insignificante`, `bajo`, `medio`, `alto`, `critico`).
@@ -33,59 +36,62 @@ Themis requires a robust relational database schema and domain model in PostgreS
 
 ## 2. Core Functional Requirements & Workflow Invariants
 
+Canonical copy of this diagram: `.agents/knowledge/operational-process-workflow.md`.
+
+```mermaid
+flowchart TD
+  create["1. Create process<br/>company, area, liable, assessedAt"]
+  notify["2. Hermes notifies liable"]
+  meeting["3. Kickoff meeting<br/>liable + risk user"]
+  risks["4. Identify N risks<br/>frequency, severity, losable, taxonomy leaf, grade"]
+  controls["5. Risk user proposes controls<br/>frequency; map M:N to risks"]
+  review["6. Liable reviews each control"]
+  changes{"Any control<br/>needs changes?"}
+  amend["Liable comment required<br/>risk user amends"]
+  close["7. Process APPROVED<br/>overallGrade = mean of risk grades"]
+  visible["8. Read-only for liable<br/>and granted sub-liables"]
+  later{"Expiry or change?"}
+  migrate["9. Migrate: new version of same familyId<br/>FULL / ONLY_RISKS / ONLY_CONTROLS / METADATA_ONLY"]
+  expire["EXPIRED"]
+
+  create --> notify --> meeting --> risks --> controls --> review --> changes
+  changes -->|yes| amend --> controls
+  changes -->|no — all approved, count ≥ 1| close --> visible --> later
+  later -->|migrate| migrate
+  later -->|no renewal| expire
+  migrate -->|"old row = MIGRATED"| create
 ```
-+--------------------------------------------------------------------------------------------------+
-|                                    GRC PROCESS LIFECYCLE                                         |
-+--------------------------------------------------------------------------------------------------+
-                                                 |
-  1. Process Creation (Company, Area, Liable)   v
-  +-----------------------------------------------------------------------------------------------+
-  | Status: DRAFT -> Liable notified via Hermes -> Meeting held (Logged on Timeline)              |
-  +-----------------------------------------------------------------------------------------------+
-                                                 |
-  2. Risk Identification & Assessment            v
-  +-----------------------------------------------------------------------------------------------+
-  | Risk User & Liable define N Risks:                                                            |
-  | - Frequency (1..5) x Severity (1..5) -> Grade (Heatmap Matrix)                                |
-  | - isLosable flag (Boolean: financial loss exposure vs non-financial)                          |
-  | - Taxonomy Leaf Node                                                                          |
-  +-----------------------------------------------------------------------------------------------+
-                                                 |
-  3. Control Definition & Mapping                v
-  +-----------------------------------------------------------------------------------------------+
-  | Risk User defines Controls (code, description, frequency: DAILY..PER_TRANSACTION).            |
-  | Links Controls to Risks (Many-to-Many via RiskControlMitigation).                             |
-  | Status: PENDING_APPROVAL                                                                      |
-  +-----------------------------------------------------------------------------------------------+
-                                                 |
-  4. Control Approval / Feedback Loop            v
-  +-----------------------------------------------------------------------------------------------+
-  | Liable reviews each Control:                                                                  |
-  | - APPROVED -> Status updated to APPROVED                                                      |
-  | - CHANGES_REQUESTED -> Requires mandatory Liable feedback comment; Risk user amends control   |
-  | Loop repeats until 100% of controls are APPROVED.                                            |
-  +-----------------------------------------------------------------------------------------------+
-                                                 |
-  5. Process Closure                             v
-  +-----------------------------------------------------------------------------------------------+
-  | Process transitions to APPROVED. Overall Process Grade calculated.                            |
-  | Read-only access granted to Liable and Authorized Viewers (sub-liables).                      |
-  +-----------------------------------------------------------------------------------------------+
-                                                 |
-  6. Process Migration & Versioning (On Expiry or Changes)                                        |
-  +-----------------------------------------------------------------------------------------------+
-  | - New Process instantiated with `migratedFromId = oldProcess.id`, `version = v + 1`.          |
-  | - Old Process archived as MIGRATED (immutable).                                               |
-  | - Selective Migration options: FULL, ONLY_CONTROLS, ONLY_RISKS, METADATA_ONLY.                |
-  | - Full lineage and migration reason logged in Timeline and ProcessMigrationLog.               |
-  +-----------------------------------------------------------------------------------------------+
+
+```mermaid
+stateDiagram-v2
+  [*] --> DRAFT: CreateProcess
+  DRAFT --> IN_REVIEW: Meeting recorded
+  IN_REVIEW --> PENDING_APPROVAL: ≥1 risk and every risk has ≥1 control
+  PENDING_APPROVAL --> IN_REVIEW: Any control CHANGES_REQUESTED
+  PENDING_APPROVAL --> APPROVED: All controls APPROVED and count ≥ 1
+  APPROVED --> MIGRATED: MigrateProcess
+  APPROVED --> EXPIRED: expiresAt passed
 ```
+
+**Locked invariants (ADR-0006):**
+- Vacuous approval is forbidden: zero controls must not close the process.
+- New risk grades derive from the heatmap. Canonical cell **poco frecuente × bajo → Insignificante**. Store grade; do not overwrite historic outliers.
+- Migration inserts a new version row (`familyId` stable). Copied controls reset to `PENDING_APPROVAL`.
+- UI timeline ≠ Astraea hash-chain ledger. Both are written on every transition.
+- Dashboard v1: counts by `isLosable` × month(`assessedAt`) × company. Not invented MXN midpoints.
+
+**Locked authorization (ADR-0007):** `User` is identity only. `CompanyMembership` + `ProcessAssignment` (exactly one `LIABLE`). Sub-liables cannot approve. **Not Oso / OpenFGA / SpiceDB.**
 
 ---
 
 ## 3. Database Entity Specifications
 
 ### 3.1 Organizational & Access Model
+
+**Superseded by ADR-0007:** do not implement `User.role` or a single `User.companyId`. Use `CompanyMembership` and `ProcessAssignment` (exactly one `LIABLE` per process). `ProcessViewer` is replaced by assignment kinds `SUB_LIABLE` | `STAKEHOLDER` | `AUDITOR`.
+
+The field lists below remain useful for Company / Area / capital requirements. Treat the `User.role` enum in §5 as stale.
+
 1. **`Company`**:
    - `id`: UUID (Primary Key).
    - `code`: String (Unique, e.g., `GSE`, `GSA`, `PR`).
@@ -272,10 +278,10 @@ Calculated automatically when a Risk is saved:
 | **Casi cierta (5)** | Bajo | Bajo | Medio | Crítico | Crítico |
 | **Muy frecuente (4)** | Insignificante | Bajo | Medio | Crítico | Crítico |
 | **Frecuente (3)** | Insignificante | Bajo | Medio | Alto | Crítico |
-| **Poco frecuente (2)** | Insignificante | Insignificante / Bajo | Medio | Alto | Crítico |
+| **Poco frecuente (2)** | Insignificante | **Insignificante** | Medio | Alto | Crítico |
 | **Rara (1)** | Insignificante | Insignificante | Bajo | Medio | Alto |
 
-*Note: In the domain entity `Risk`, a pure lookup function maps `(frequency, severity) => RiskGrade`.*
+*Note: In the domain entity `Risk`, a pure lookup function maps `(frequency, severity) => RiskGrade` for **new** assessments. Canonical cell **poco frecuente × bajo = Insignificante** (ADR-0006). Grade is stored on the row so historic outliers can be imported unchanged.*
 
 ### 4.2 Overall Process Grade Formula
 When all controls are approved, the overall process grade is calculated as the rounded arithmetic mean of individual risk grades:
@@ -283,24 +289,21 @@ $$\text{NumericGrade}(g) = \begin{cases} 1 & \text{INSIGNIFICANT} \\ 2 & \text{L
 $$\text{MeanScore} = \frac{1}{N} \sum_{i=1}^N \text{NumericGrade}(r_i.\text{grade})$$
 $$\text{OverallProcessGrade} = \text{GradeFromNumeric}(\text{round}(\text{MeanScore}))$$
 
-### 4.3 Economic Severity Dashboard Calculations
-Risk managers can filter monthly portfolios by company or portfolio-wide:
-- **Filters**: `companyId` (optional), `year`, `month`, `isLosable` (true = losable, false = non-losable).
-- **Valuation Logic**:
-  - Each severity level is evaluated against the `CompanyCapitalRequirement` for that company and year.
-  - **Representative Monetary Exposure Benchmark**:
-    - $\text{Insignificant} = \frac{\text{insignificantMax}}{2}$
-    - $\text{Low} = \frac{\text{insignificantMax} + \text{lowMax}}{2}$
-    - $\text{Medium} = \frac{\text{lowMax} + \text{mediumMax}}{2}$
-    - $\text{High} = \frac{\text{mediumMax} + \text{highMax}}{2}$
-    - $\text{Critical} = \text{criticalMin} \times 1.25$
-- Monthly aggregations compute:
-  - Total Losable Risk Count & Estimated Economic Exposure ($\sum \text{Benchmark}$)
-  - Total Non-Losable Risk Count & Exposure Distribution
+A process with zero risks or zero controls cannot reach `APPROVED`.
+
+### 4.3 Losable Dashboard (v1)
+
+Risk managers filter by company (optional) and calendar month of `assessedAt`.
+
+**v1 (ADR-0006):** counts of risks by `isLosable` × severity. Do not ship invented MXN midpoints.
+
+RCOP bands on `CompanyCapitalRequirement` stay seeded for a later exposure view. The `criticalMin × 1.25` midpoint formula is **not** accepted for v1.
 
 ---
 
-## 5. Complete Prisma Schema Representation
+## 5. Illustrative Prisma Schema
+
+OpenCode owns `schema.prisma`. This dump is a sketch. **Conflicts lose to ADR-0006 and ADR-0007** (`User.role`, single `companyId`, `ProcessViewer`, missing `familyId` / `assessedAt` / `expiresAt` / `Meeting` / outbox).
 
 ```prisma
 datasource db {

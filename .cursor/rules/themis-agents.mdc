@@ -7,7 +7,7 @@ alwaysApply: true
 # Cursor Rule: Themis Shared AI Layer
 
 - **Shared State Directory:** `.agents/`
-- **Spec:** `docs/superpowers/specs/2026-09-21-project-rules-hardening-design.md`
+- **Spec:** `docs/superpowers/specs/2026-09-21-project-rules-hardening-design.md`. Operational GRC: ADR-0006, ADR-0007, `docs/superpowers/specs/2026-09-21-database-schema-grc-core-design.md`.
 - **Core Guidelines:** Clean Architecture, S.O.L.I.D., and Clean Code in `.agents/rules/` (`00`, `02`, `03`, `04`, `06`).
 - **Workspaces:** `apps/iris` (TanStack Start host), `apps/olympus` (NestJS), `packages/nomos` (Zod contracts).
 - **UI & Aesthetics:** `impeccable` and `web-design-guidelines`. Avoid generic AI styling.

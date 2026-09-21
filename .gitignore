@@ -26,3 +26,8 @@ coverage/
 # Transient AI Locks (keep directory, ignore locks)
 .agents/tasks/locks/*.lock
 !.agents/tasks/locks/README.md
+
+# Others
+*.csv
+*.xlsx
+*.txt

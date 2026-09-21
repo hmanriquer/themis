@@ -9,6 +9,7 @@ Because Themis is an enterprise-grade Governance, Risk, and Compliance platform,
 *   **Zero Trust & Principle of Least Privilege:**
     *   Every user, service, and API client has the minimum necessary permissions to perform its function.
     *   Role-Based Access Control (RBAC) and Attribute-Based Access Control (ABAC) must be enforced at the Application Use Case boundary, not merely in UI views.
+    *   **v1 implementation (ADR-0007):** `CompanyMembership` + `ProcessAssignment` evaluated inside `olympus` services. Do **not** add Oso, Oso Cloud, OpenFGA, or SpiceDB. Liable is a process assignment, not a global `User.role`. Sub-liables may read a process and its timeline; they must not approve controls. Postgres RLS is phase 2, not a substitute for use-case checks.
 *   **Immutability of Audit Trails:**
     *   Audit logs must be append-only. No `UPDATE` or `DELETE` operations are ever permitted on audit entities.
     *   Each audit record must incorporate cryptographic chaining (SHA-256 / HMAC) referencing the hash of the preceding entry, producing a tamper-evident audit ledger.

@@ -22,6 +22,10 @@
 - **Naming:** Greek for apps/packages/modules/features (`dike`, `prometheus`, `astraea`, `argus`, `hermes`, `mnemosyne`). English GRC for entities, copy, and URLs.
 - **Quality Gates:** TDD with 100% domain coverage, `react-doctor` score ≥ 90/100, WCAG 2.1 AA accessibility.
 - **Canonical spec:** `docs/superpowers/specs/2026-09-21-project-rules-hardening-design.md`.
+- **Operational process-risk (v1):** ADR-0006 (PostgreSQL + Prisma, process lifecycle, heatmap), ADR-0007 (membership + process assignment; not Oso). Spec `docs/superpowers/specs/2026-09-21-database-schema-grc-core-design.md`. Workflow `.agents/knowledge/operational-process-workflow.md`.
+- **Bounded context:** `prometheus` operational Process/Risk/Control is not the Dike ISO/SOC 2 control catalog. Do not share one `Control` entity.
+- **Heatmap:** Derive grade from (frequency, severity) for new rows. Canonical cell *poco frecuente × bajo* = Insignificante. Store grade; do not overwrite historic outliers on seed.
+- **AuthZ:** `User` is identity only. Liable is `ProcessAssignment`. Sub-liables cannot approve.
 
 ## 4. Installed Skills Summary
 - Methodology: `obra/superpowers` (15 skills)

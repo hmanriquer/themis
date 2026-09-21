@@ -12,6 +12,8 @@ All 4 AI agents operate under a shared, centralized repository structure located
 
 Canonical architecture spec: `[docs/superpowers/specs/2026-09-21-project-rules-hardening-design.md](file:///home/grillo/development/themis/docs/superpowers/specs/2026-09-21-project-rules-hardening-design.md)`.
 
+Operational process-risk (v1): `[ADR-0006](file:///home/grillo/development/themis/.agents/decisions/ADR-0006-operational-process-risk-postgres.md)`, `[ADR-0007](file:///home/grillo/development/themis/.agents/decisions/ADR-0007-authorization-membership-not-oso.md)`, spec `[2026-09-21-database-schema-grc-core-design.md](file:///home/grillo/development/themis/docs/superpowers/specs/2026-09-21-database-schema-grc-core-design.md)`, workflow `[operational-process-workflow.md](file:///home/grillo/development/themis/.agents/knowledge/operational-process-workflow.md)`.
+
 ---
 
 ## 1. Universal Single Source of Truth (`.agents/`)
@@ -43,7 +45,7 @@ themis/
     │   └── 06-backend-nestjs.md
     ├── hooks/
     ├── personas/
-    ├── decisions/                 <-- ADR-0001 … ADR-0005
+    ├── decisions/                 <-- ADR-0001 … ADR-0007
     ├── docs/
     ├── knowledge/
     ├── tasks/
@@ -58,7 +60,7 @@ themis/
 
 ### Workspaces
 - **`apps/iris`:** TanStack Start. Routing and SSR only. No `createServerFn` for GRC business logic.
-- **`apps/olympus`:** NestJS with native DI. Domain, services, controllers. See `.agents/rules/06-backend-nestjs.md`.
+- **`apps/olympus`:** NestJS with native DI. Domain, services, controllers. PostgreSQL + Prisma in `infrastructure/` (ADR-0006). See `.agents/rules/06-backend-nestjs.md`.
 - **`packages/nomos`:** Zod schemas, inferred DTOs, path/error constants. No React, Nest, or formulas.
 
 ### Clean Architecture Mapping
@@ -68,6 +70,10 @@ Dependencies point **strictly inward**:
 3. **Infrastructure (`olympus` `infrastructure/`):** Repository adapters, crypto, external clients. Nest providers.
 4. **Presentation (API):** Nest controllers, `/v1`, `ZodValidationPipe` from `nomos`.
 5. **Presentation (UI):** `iris` feature folders. Routes dumb, feature components smart, `shared/ui` primitives dumb. `iris` consumes `nomos` DTOs only and calls `olympus` through `ky` inside `api/`.
+
+### Authorization (ADR-0007)
+- Built-in RBAC + resource grants in `olympus` use cases. **Not Oso / OpenFGA / SpiceDB.**
+- `User` is identity only. `CompanyMembership` is the company role. `ProcessAssignment` is liable / sub-liable / viewer. Sub-liables cannot approve.
 
 ### S.O.L.I.D. & Hygiene
 - Follow `.agents/rules/00-clean-code-solid.md`.

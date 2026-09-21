@@ -19,4 +19,4 @@ Do not look for a project `.gemini/skills` or `.agent/skills` copy. Workspace sk
 6. **Persona:** Read `.agents/personas/antigravity.md` and `.agents/personas/roles.md`.
 7. **Task Locking:** Run `.agents/hooks/pre-task.sh <TASK_ID> Antigravity` before editing files.
 8. **Memory:** Read `.agents/memory/index.md` and search with `.agents/memory/memory-helper.sh search "<query>"`.
-9. **Spec:** `docs/superpowers/specs/2026-09-21-project-rules-hardening-design.md`.
+9. **Spec:** `docs/superpowers/specs/2026-09-21-project-rules-hardening-design.md`. Operational GRC: ADR-0006, ADR-0007.

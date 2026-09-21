@@ -55,7 +55,8 @@ Shared domain needed by two modules stays in `olympus` (or a later package). It 
 *   Version all public routes under `/v1`.
 *   Path strings come from `@themis/nomos` constants — no magic strings.
 *   Controllers return DTOs that match `nomos` Zod response schemas.
-*   Persistence and auth libraries (Prisma, Drizzle, Passport, etc.) are chosen later and must register as Nest providers. This rule file does not pick them.
+*   Persistence is **PostgreSQL + Prisma** (ADR-0006), registered as Nest providers in `infrastructure/`. Domain folders stay Prisma-free.
+*   Authorization libraries (Oso, OpenFGA) are **out of scope**. Use Nest Guards plus a policy function (ADR-0007). Identity provider (Better Auth vs Nest JWT) is still undecided.
 
 ---
 

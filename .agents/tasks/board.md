@@ -12,7 +12,7 @@ This board coordinates active, backlog, and completed development tasks across a
 | **Ready for Work** | 1 |
 | **In Progress** | 0 |
 | **In Review / Verification** | 0 |
-| **Completed** | 4 |
+| **Completed** | 5 |
 
 ---
 
@@ -27,8 +27,8 @@ This board coordinates active, backlog, and completed development tasks across a
 - [ ] `TASK-003`: **GRC Domain Model Implementation (Entities & Value Objects)**
   - **Owner:** Codex
   - **Priority:** High
-  - **Scope:** Pure domain models for Framework, Control, Risk, Evidence, AuditEvent in `olympus` pantheon `domain/` folders (English GRC names). Strict validation and immutable value objects. DTOs/schemas for the same concepts belong in `@themis/nomos` once that package exists.
-  - **Dependencies:** `TASK-002` (Completed), `TASK-008` (Completed). Prefer landing after or with `TASK-009` workspace scaffolding.
+  - **Scope:** Pure domain models for **operational** Process, Risk, Control, TaxonomyNode, Meeting, CompanyMembership, ProcessAssignment in `olympus` `prometheus` `domain/` (English GRC names). Obey ADR-0006 / ADR-0007. Framework, Evidence, and residual 1..25 scoring stay out of this task (later Dike/Mnemosyne). DTOs belong in `@themis/nomos` once that package exists.
+  - **Dependencies:** `TASK-002` (Completed), `TASK-008` (Completed), `TASK-010` (Completed). Prefer landing after or with `TASK-009` workspace scaffolding.
 
 ---
 
@@ -53,6 +53,11 @@ This board coordinates active, backlog, and completed development tasks across a
 ---
 
 ## 4. Completed
+
+- [x] `TASK-010`: **Record Operational Process-Risk & Authorization Decisions**
+  - **Owner:** Cursor
+  - **Date Completed:** 2026-09-21
+  - **Outcome:** Accepted ADR-0006 (PostgreSQL + Prisma, process lifecycle, heatmap, migration) and ADR-0007 (CompanyMembership + ProcessAssignment; not Oso). Cascaded into `DESIGN.md`, `AGENTS.md`, rules 05/06, knowledge workflow, spec mermaid, memory, and task board.
 
 - [x] `TASK-008`: **Project Rules Hardening**
   - **Owner:** Cursor (amendment) / Antigravity (original spec)

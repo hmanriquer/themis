@@ -15,7 +15,8 @@ This knowledge document provides essential context for all 4 AI agents to accura
 
 ### Risk Management
 *   **Definition:** The systematic identification, evaluation, prioritization, and mitigation of operational, cyber, financial, and regulatory threats.
-*   **Calculation Mechanics:**
+*   **Calculation Mechanics (operational v1 — ADR-0006):** qualitative 5×5 heatmap of frequency × severity. Canonical cell *poco frecuente × bajo* = Insignificante. Process grade is the rounded mean of member risk grades. See `.agents/knowledge/operational-process-workflow.md`.
+*   **Calculation Mechanics (framework residual — later Dike):**
     *   $\text{Inherent Risk} = \text{Likelihood} \times \text{Impact}$ (where Likelihood $\in [1..5]$, Impact $\in [1..5]$, producing a score $\in [1..25]$).
     *   $\text{Control Mitigation Factor} \in [0.0..1.0]$ based on control maturity and testing status.
     *   $\text{Residual Risk} = \text{Inherent Risk} \times (1 - \text{Mitigation Factor})$.
