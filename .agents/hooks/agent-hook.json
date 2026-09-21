@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "themis-agent-hooks",
+  "version": "1.0.0",
+  "description": "Lifecycle hooks for Codex, OpenCode, Cursor, and Antigravity",
+  "hooks": {
+    "onTaskStart": {
+      "command": ".agents/hooks/pre-task.sh ${TASK_ID} ${AGENT_NAME} ${TARGET_PATH}",
+      "description": "Acquires concurrency lock and logs task start"
+    },
+    "onTaskComplete": {
+      "command": ".agents/hooks/post-task.sh ${TASK_ID} ${AGENT_NAME} \"${SUMMARY}\"",
+      "description": "Releases concurrency lock, writes activity log and appends to persistent memory"
+    },
+    "onPreCommit": {
+      "commands": [
+        "npx react-doctor --check",
+        "pnpm test"
+      ],
+      "description": "Enforces quality gates before code is committed"
+    }
+  }
+}

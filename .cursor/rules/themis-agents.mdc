@@ -1,0 +1,14 @@
+---
+description: Universal Multi-AI Shared Coordination Rule for Cursor
+globs: *
+alwaysApply: true
+---
+
+# Cursor Rule: Themis Shared AI Layer
+
+- **Shared State Directory:** `.agents/`
+- **Core Guidelines:** Follow Clean Architecture, S.O.L.I.D., and Clean Code standards located in `.agents/rules/`.
+- **UI & Aesthetics:** Adhere to `impeccable` design guardrails and `web-design-guidelines`. Avoid generic AI styling.
+- **State Separation:** Server state belongs exclusively in TanStack Query; UI state belongs in Zustand feature slices; route filters belong in URL params.
+- **Skills:** Loaded directly from `.agents/skills/`.
+- **Coordination:** Respect task locks in `.agents/tasks/locks/`.

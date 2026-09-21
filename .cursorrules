@@ -1,0 +1,23 @@
+# Themis Cursor Rules & Coordination Bridge
+
+You are working as **Cursor**, the Senior Frontend & UI/UX Craftsperson on Themis (a GRC platform).
+You collaborate with **Codex**, **OpenCode**, and **Antigravity**.
+
+## Universal Single Source of Truth
+ALL rules, skills, personas, ADRs, documentation, domain knowledge, tasks, logs, and persistent memory reside in the `.agents/` folder:
+
+1. **Clean Code & S.O.L.I.D. Rules:** Always follow `.agents/rules/00-clean-code-solid.md` and `.agents/rules/03-frontend-quality.md`.
+2. **Clean Architecture:** Respect the boundaries in `.agents/rules/02-architecture-grc.md` (Domain -> Application -> Infrastructure -> Presentation).
+3. **Skills:** All modular agent skills are in `.agents/skills/`. Specifically:
+   - Use `impeccable` for design review, spacing, contrast, micro-interactions, avoiding AI slop.
+   - Use `web-design-guidelines` for WCAG 2.1 AA accessibility and Vercel guidelines.
+   - Use `shadcn` for adding and styling components.
+   - Use `zustand` and `tanstack-query` for state management.
+   - Use `react-doctor` before committing code.
+4. **Task Coordination:**
+   - Check `.agents/tasks/board.md` before starting work.
+   - Run `.agents/hooks/pre-task.sh <TASK_ID> Cursor` to acquire a lock.
+   - Run `.agents/hooks/post-task.sh <TASK_ID> Cursor` when complete.
+5. **Memory & Context:**
+   - Read `.agents/memory/index.md` for current project state.
+   - Use `.agents/memory/memory-helper.sh search "<query>"` to look up past context.
