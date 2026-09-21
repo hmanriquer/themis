@@ -1,65 +1,129 @@
 # Clean Architecture for Themis (GRC Domain)
 
-Themis adheres strictly to Robert C. Martin's Clean Architecture. The architecture is organized in concentric layers with dependencies pointing strictly inward.
+Themis adheres strictly to Robert C. Martin's Clean Architecture. Dependencies point strictly inward. The monorepo maps those layers onto two apps and one contract package — it does not keep a single `src/domain` tree at the repository root.
+
+Canonical design: `docs/superpowers/specs/2026-09-21-project-rules-hardening-design.md`.
 
 ```
        +--------------------------------------------------+
-       |   Presentation (UI, Components, Pages, Stores)   |
+       |  iris (TanStack Start) — Presentation            |
+       |  routes + feature components + Query + Zustand   |
        |  +--------------------------------------------+  |
-       |  |   Infrastructure (APIs, Storage, Crypto)   |  |
-       |  |  +--------------------------------------+  |  |
-       |  |  |   Application (Use Cases, DTOs)      |  |  |
-       |  |  |  +--------------------------------+  |  |  |
-       |  |  |  |  Domain (Entities, Value Obj)  |  |  |  |
-       |  |  |  +--------------------------------+  |  |  |
-       |  |  +--------------------------------------+  |  |
+       |  |  nomos — Zod DTOs, paths, error envelope   |  |
        |  +--------------------------------------------+  |
+       +--------------------------------------------------+
+                          |
+                          | HTTPS /v1  (ky from iris api/)
+                          v
+       +--------------------------------------------------+
+       |  olympus (NestJS)                                |
+       |  Controllers → Services → Domain                 |
+       |  Infrastructure implements domain ports          |
        +--------------------------------------------------+
 ```
 
 ---
 
-## 1. Domain Layer (`src/domain/`)
+## 1. Workspace Mapping
 
-*   **Responsibility:** Represents enterprise business rules and GRC concepts. It is completely independent of frameworks, UI, and external libraries.
-*   **Contents:**
-    *   **Entities:** Objects with a unique identity and lifecycle (e.g., `Risk`, `Control`, `Evidence`, `AuditAssessment`).
-    *   **Value Objects:** Immutable objects characterized only by their attributes (e.g., `RiskScore`, `ControlCode`, `ComplianceStatus`, `EvidenceHash`).
-    *   **Domain Events:** Events signaling significant business occurrences (e.g., `RiskExceededThresholdEvent`, `ControlFailedAuditEvent`).
-    *   **Repository Interfaces:** Ports defining how domain entities are persisted or retrieved (e.g., `IRiskRepository`, `IControlRepository`).
-    *   **Domain Exceptions:** Custom errors capturing invariant violations (e.g., `InvalidControlStateTransitionError`).
-*   **Dependencies:** ZERO external dependencies (no React, no Next.js, no Prisma/Drizzle, no Axios). Pure TypeScript only.
+| Workspace | Role | Clean Architecture |
+| :--- | :--- | :--- |
+| `apps/iris` | Frontend host | Presentation + frontend application (hooks) + HTTP adapters |
+| `apps/olympus` | NestJS API | Presentation (controllers), Application (services), Domain, Infrastructure |
+| `packages/nomos` | Shared contracts | Zod schemas, inferred types, path/error constants. Not domain logic. |
 
----
+`iris` must never import `olympus` source. `nomos` must never import React, Nest, or `ky`. Domain formulas (residual risk, hash chaining) live only in `olympus`.
 
-## 2. Application Layer (`src/application/`)
-
-*   **Responsibility:** Coordinates use cases and business workflows. Orchestrates domain entities to fulfill specific application features.
-*   **Contents:**
-    *   **Use Cases:** Single-purpose command/query handlers (e.g., `AssessRiskUseCase`, `SubmitControlEvidenceUseCase`, `GenerateComplianceReportUseCase`).
-    *   **DTOs (Data Transfer Objects):** Plain data structures crossing boundaries between presentation/infrastructure and application.
-    *   **Ports & Secondary Interfaces:** Abstractions for notification services, cryptographic signing, or audit streamers (e.g., `IAuditStreamer`, `INotificationService`).
-*   **Dependencies:** Depends ONLY on the Domain layer. Never imports Presentation or Infrastructure.
+YAGNI: do not add `@themis/ui` or `@themis/domain` until a second consumer exists.
 
 ---
 
-## 3. Infrastructure Layer (`src/infrastructure/`)
+## 2. Domain Layer (`olympus` module `domain/` folders)
 
-*   **Responsibility:** Implements ports and secondary interfaces defined in Domain and Application layers. Manages external tools, databases, APIs, and OS features.
+*   **Responsibility:** Enterprise business rules and GRC concepts. Completely independent of frameworks, UI, and external libraries.
 *   **Contents:**
-    *   **Repository Implementations:** E.g., `IndexedDbRiskRepository`, `RestApiControlRepository`, `SupabaseEvidenceRepository`.
-    *   **Cryptographic Services:** E.g., `WebCryptoAuditSigner` (SHA-256 / Ed25519 tamper-evident hashing).
-    *   **Adapters & External Clients:** Connectors to external GRC sources (AWS Security Hub, GitHub Audit, Cloudflare).
-*   **Dependencies:** Depends on Application and Domain layers, plus external libraries.
+    *   **Entities:** Objects with identity and lifecycle (`Risk`, `Control`, `Evidence`, `AuditAssessment`). English GRC names, not pantheon names.
+    *   **Value Objects:** Immutable (`RiskScore`, `ControlCode`, `ComplianceStatus`, `EvidenceHash`).
+    *   **Domain Events:** `RiskExceededThresholdEvent`, `ControlFailedAuditEvent`.
+    *   **Repository Interfaces:** Ports (`IRiskRepository`, `IControlRepository`).
+    *   **Domain Exceptions:** `InvalidControlStateTransitionError` extending `ThemisError`.
+*   **Dependencies:** ZERO external dependencies (no React, no Nest, no Prisma/Drizzle, no Axios, no `ky`). Pure TypeScript only.
 
 ---
 
-## 4. Presentation Layer (`src/presentation/`)
+## 3. Application Layer (`olympus` `*.service.ts`)
 
-*   **Responsibility:** User interface, state management, and user interaction.
+*   **Responsibility:** Coordinates use cases and business workflows. Orchestrates domain entities to fulfill application features.
+*   **Contents:** Nest injectable services acting as use cases (`AssessRisk`, `SubmitControlEvidence`, `GenerateComplianceReport`).
+*   **Dependencies:** Domain folders only. Never imports controllers or React. Persistence enters through injected ports.
+
+---
+
+## 4. Infrastructure Layer (`olympus` module `infrastructure/`)
+
+*   **Responsibility:** Implements ports defined in Domain and Application. Manages databases, crypto, and external APIs.
 *   **Contents:**
-    *   **Components:** Modular React 19 components using Shadcn UI / Tailwind CSS.
-    *   **State Stores:** Zustand feature slices for transient UI state (e.g., active filters, drawer state, modal visibility).
-    *   **Query Hooks:** TanStack Query hooks consuming Application Use Cases / API services for server state.
-    *   **View Transitions:** Smooth screen and navigation animations using `@vercel/react-view-transitions`.
-*   **Dependencies:** Depends on Application and Domain layers for DTOs and contracts.
+    *   Repository implementations (`PostgresRiskRepository`, `RestEvidenceAdapter`).
+    *   Cryptographic services (`WebCryptoAuditSigner` — SHA-256 / Ed25519).
+    *   Adapters to external GRC sources (AWS Security Hub, GitHub Audit, Cloudflare).
+*   **Dependencies:** Domain/application ports plus external libraries. Registered as Nest providers.
+
+---
+
+## 5. Presentation — Backend (`olympus` controllers)
+
+*   Thin HTTP: route params, Zod validation via `ZodValidationPipe`, status mapping.
+*   API versioned under `/v1`. Path tokens come from `nomos`.
+*   No domain formulas in controllers.
+
+---
+
+## 6. Presentation — Frontend (`apps/iris`)
+
+Feature-based folders mapped to Clean Architecture:
+
+```
+apps/iris/
+  app/routes/                    # dumb route shells
+  src/features/<pantheon-name>/
+    api/                         # infrastructure: ky + queryOptions
+    hooks/                       # application: Query/Mutation/UI hooks
+    stores/                      # client state machines (Zustand)
+    components/                  # smart feature UI
+    constants/
+    tests/                       # feature integration only
+  src/shared/
+    http/                        # ky singleton
+    ui/                          # dumb Shadcn primitives
+    hooks/
+```
+
+| Layer | `iris` location |
+| :--- | :--- |
+| Presentation | `app/routes/`, `features/*/components/`, `shared/ui/` |
+| Application | `features/*/hooks/` |
+| Infrastructure | `features/*/api/`, `shared/http/` |
+| Domain | Not in `iris`. Use `@themis/nomos` DTOs. |
+
+### Three-layer UI
+*   **Routes are dumb.** Layout, `validateSearch`, optional `ensureQueryData`. No `ky`, no inline mutations, no domain state.
+*   **Feature components are smart.** They consume feature hooks and stores.
+*   **Shared primitives are dumb.** Props in, events out.
+
+### State
+*   **TanStack Query:** All server reads and writes (interactions). Optimistic updates live here.
+*   **Zustand:** Transient UI and explicit state machines. Never a copy of Query data. Never optimistic API writes.
+*   **URL:** Filters, pagination, search, and view mode.
+
+View transitions use TanStack Router plus `@vercel/react-view-transitions`. Do not copy Next.js `Link` / `loading.tsx` patterns.
+
+---
+
+## 7. NestJS Compatibility
+
+Follow Nest's own architecture so the framework does not break:
+
+*   One Nest module per pantheon name (`DikeModule`, `PrometheusModule`, …).
+*   Native `@Injectable()` constructor injection. No second IoC container.
+*   Template: `*.module.ts`, `*.controller.ts`, `*.service.ts`, `domain/`, `infrastructure/`.
+*   Full Nest rules: `.agents/rules/06-backend-nestjs.md`.

@@ -50,7 +50,7 @@ These skills are **readable** by every agent. Search/MCP execution still depends
 | `web-design-guidelines` | `vercel-labs/agent-skills` | Auditing layouts against Vercel's Web Interface Guidelines and WCAG 2.1 accessibility. | Cursor |
 | `shadcn` | `shadcn/ui` | Adding, configuring, and styling Shadcn components and Base/Radix primitives. | Cursor |
 | `migrate-radix-to-base` | `shadcn/ui` | Migrating components to Base UI primitives when needed. | Cursor |
-| `vercel-react-view-transitions` | `vercel-labs/agent-skills` | Adding smooth animated transitions between dashboard views and detail routes. | Cursor |
+| `vercel-react-view-transitions` | `vercel-labs/agent-skills` | Smooth transitions. **Themis:** drive them with TanStack Router, not Next.js `Link` / `loading.tsx`. | Cursor |
 | `vercel-composition-patterns` | `vercel-labs/agent-skills` | Structuring components using slots, compound patterns, and render props. | Cursor, Codex |
 | `vercel-react-best-practices` | `vercel-labs/agent-skills` | React 19 standards, server/client component boundaries, memoization, pure rendering. | Cursor, Codex |
 
@@ -60,7 +60,7 @@ These skills are **readable** by every agent. Search/MCP execution still depends
 
 | Skill | Source | Trigger / When to Use | Primary Agent |
 | :--- | :--- | :--- | :--- |
-| `zustand` | `lobehub/lobehub` | Building Zustand stores, slices, selectors, and atomic state updates. | Cursor, Codex |
+| `zustand` | `lobehub/lobehub` | UI machines and slices. **Themis override:** no optimistic API writes in stores — those belong in TanStack Query. | Cursor, Codex |
 | `store-data-structures` | `lobehub/lobehub` | Guidance on normalized data shapes and store organization. Companion to `zustand`. | Cursor, Codex |
 | `heterogeneous-agent` | `lobehub/lobehub` | External-agent adapters, IPC, event mapping, sessions, and tool-call chains. | OpenCode, Antigravity |
 | `tanstack-query` | `tanstack-skills` | Server state management, caching, background polling, and mutations. | Codex, Cursor |
@@ -68,7 +68,7 @@ These skills are **readable** by every agent. Search/MCP execution still depends
 | `tanstack-table` | `tanstack-skills` | High-performance data grids for compliance controls and audit logs. | Cursor, Codex |
 | `tanstack-form` | `tanstack-skills` | Type-safe form state for risk, evidence, and control editors. | Cursor, Codex |
 | `tanstack-router` | `tanstack-skills` | Type-safe routing, search params, and data loading. | Cursor |
-| `tanstack-start` | `tanstack-skills` | Full-stack TanStack Start routing and SSR patterns. | Cursor |
+| `tanstack-start` | `tanstack-skills` | TanStack Start routing and SSR. **Themis:** frontend host only — no `createServerFn` for GRC business logic. | Cursor |
 | `tanstack-store` | `tanstack-skills` | Framework-agnostic reactive store primitives. | Codex, Cursor |
 | `tanstack-db` | `tanstack-skills` | Client-side collections and reactive local data. | Codex |
 | `tanstack-virtual` | `tanstack-skills` | Virtualized lists for large control and audit tables. | Cursor |

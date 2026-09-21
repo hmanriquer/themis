@@ -10,6 +10,8 @@ Themis is developed collaboratively by a 4-AI engineering team:
 
 All 4 AI agents operate under a shared, centralized repository structure located at `[.agents/](file:///home/grillo/development/themis/.agents/)`.
 
+Canonical architecture spec: `[docs/superpowers/specs/2026-09-21-project-rules-hardening-design.md](file:///home/grillo/development/themis/docs/superpowers/specs/2026-09-21-project-rules-hardening-design.md)`.
+
 ---
 
 ## 1. Universal Single Source of Truth (`.agents/`)
@@ -18,73 +20,72 @@ Every rule, skill, decision, task, log, and memory observation is stored in `.ag
 
 ```
 themis/
+├── apps/
+│   ├── iris/                      <-- TanStack Start frontend host
+│   └── olympus/                   <-- NestJS API
+├── packages/
+│   └── nomos/                     <-- @themis/nomos Zod contracts
 ├── AGENTS.md                      <-- Universal AI onboarding guide (You are here)
-├── DESIGN.md                      <-- System architecture & product design scaffold
-├── CLAUDE.md                      <-- Claude Code bridge (points to AGENTS.md & .agents/)
-├── GEMINI.md                      <-- Antigravity / Gemini bridge (points to AGENTS.md & .agents/)
-├── .cursorrules                   <-- Cursor bridge (points to .agents/)
-├── .cursor/                       <-- Cursor configuration
-│   └── rules/themis-agents.mdc    <-- Modern Cursor rule directing to .agents/
-└── .agents/                       <-- SHARED MULTI-AI ROOT (Single Source of Truth)
-    ├── rules/                     <-- Clean Code, S.O.L.I.D. & Engineering standards
+├── DESIGN.md                      <-- System architecture & product design
+├── CLAUDE.md                      <-- Claude Code bridge
+├── GEMINI.md                      <-- Antigravity / Gemini bridge
+├── .cursorrules                   <-- Cursor bridge
+├── .cursor/rules/themis-agents.mdc
+├── docs/superpowers/specs/        <-- Architectural design specs
+└── .agents/                       <-- SHARED MULTI-AI ROOT
+    ├── rules/
     │   ├── 00-clean-code-solid.md
     │   ├── 01-ai-collaboration.md
     │   ├── 02-architecture-grc.md
     │   ├── 03-frontend-quality.md
     │   ├── 04-testing-tdd.md
-    │   └── 05-security-compliance.md
-    ├── hooks/                     <-- Lifecycle automation hooks
-    │   ├── pre-task.sh            <-- Acquires concurrency lock and logs task start
-    │   ├── post-task.sh           <-- Releases lock, logs completion, appends memory
-    │   └── agent-hook.json        <-- Hook schema specification
-    ├── personas/                  <-- AI identity profiles and role matrix
-    │   ├── antigravity.md
-    │   ├── codex.md
-    │   ├── opencode.md
-    │   ├── cursor.md
-    │   └── roles.md
-    ├── decisions/                 <-- Architectural Decision Records (ADRs)
-    │   ├── ADR-0001-multi-ai-shared-architecture.md
-    │   ├── ADR-0002-clean-architecture-solid-grc.md
-    │   └── ADR-0003-frontend-state-data-stack.md
-    ├── docs/                      <-- Collaboration protocols and architecture specs
-    │   ├── ai-coordination-protocol.md
-    │   ├── architecture-overview.md
-    │   └── skills-catalog.md
-    ├── knowledge/                 <-- GRC domain expertise & regulatory frameworks
-    │   ├── grc-domain-overview.md
-    │   ├── compliance-frameworks.md
-    │   └── audit-trail-design.md
-    ├── tasks/                     <-- Task coordination & concurrency management
-    │   ├── board.md               <-- Master task board (Backlog -> Done)
-    │   ├── locks/                 <-- Active file/feature concurrency locks
-    │   └── templates/             <-- Task definition templates
-    ├── logs/                      <-- Append-only execution history
-    │   └── activity.jsonl         <-- Structured team activity log
-    ├── memory/                    <-- Universal cross-AI persistent memory
-    │   ├── index.md               <-- Working memory index of project context
-    │   ├── observations.jsonl     <-- Append-only episodic memory stream
-    │   └── memory-helper.sh       <-- CLI memory search and append utility
-    └── skills/                    <-- 52 installed modular agent skills
+    │   ├── 05-security-compliance.md
+    │   └── 06-backend-nestjs.md
+    ├── hooks/
+    ├── personas/
+    ├── decisions/                 <-- ADR-0001 … ADR-0005
+    ├── docs/
+    ├── knowledge/
+    ├── tasks/
+    ├── logs/
+    ├── memory/
+    └── skills/
 ```
 
 ---
 
 ## 2. Core Architectural & Code Mandates
 
-### Clean Architecture Layers
-Dependencies must point **strictly inward**:
-1. **Domain Layer (`src/domain/`):** Pure TypeScript. Zero dependencies. Entities (`Risk`, `Control`, `Evidence`), value objects (`RiskScore`, `ControlCode`), and repository interfaces (`IRiskRepository`).
-2. **Application Layer (`src/application/`):** Use cases orchestrating domain rules (`AssessRiskUseCase`, `SubmitEvidenceUseCase`). Depends only on Domain.
-3. **Infrastructure Layer (`src/infrastructure/`):** Concrete repository adapters, WebCrypto audit signers, external storage. Depends on Domain and Application interfaces.
-4. **Presentation Layer (`src/presentation/`):** React 19 components, Shadcn UI primitives, Zustand client state, TanStack Query server caches, and View Transitions.
+### Workspaces
+- **`apps/iris`:** TanStack Start. Routing and SSR only. No `createServerFn` for GRC business logic.
+- **`apps/olympus`:** NestJS with native DI. Domain, services, controllers. See `.agents/rules/06-backend-nestjs.md`.
+- **`packages/nomos`:** Zod schemas, inferred DTOs, path/error constants. No React, Nest, or formulas.
 
-### S.O.L.I.D. Principles
-- **S:** Every function, component, or class has one reason to change.
-- **O:** Open for extension (compound components, strategy patterns for compliance frameworks), closed for modification.
-- **L:** Implementations must be fully substitutable for their interfaces without side effects.
-- **I:** Narrow, client-specific interfaces rather than broad "god" interfaces.
-- **D:** High-level policy depends on abstractions; details implement abstractions.
+### Clean Architecture Mapping
+Dependencies point **strictly inward**:
+1. **Domain (`olympus` `domain/`):** Pure TypeScript. Entities (`Risk`, `Control`, `Evidence`), value objects (`RiskScore`, `ControlCode`), repository ports. English GRC names.
+2. **Application (`olympus` `*.service.ts`):** Injectable use cases. Depends only on domain ports.
+3. **Infrastructure (`olympus` `infrastructure/`):** Repository adapters, crypto, external clients. Nest providers.
+4. **Presentation (API):** Nest controllers, `/v1`, `ZodValidationPipe` from `nomos`.
+5. **Presentation (UI):** `iris` feature folders. Routes dumb, feature components smart, `shared/ui` primitives dumb. `iris` consumes `nomos` DTOs only and calls `olympus` through `ky` inside `api/`.
+
+### S.O.L.I.D. & Hygiene
+- Follow `.agents/rules/00-clean-code-solid.md`.
+- Zero magic strings / magic numbers (allowed literals: `0`, `1`, `-1`).
+- React files ≤ 150 Prettier lines; compose instead of growing god components.
+- Custom hooks are **defined** only in `hooks/` folders. Components may **use** hooks.
+- Tests colocate with units; feature `tests/` is integration-only. See `.agents/rules/04-testing-tdd.md`.
+
+### Frontend Stack (`iris`)
+- TanStack Query for **all** server interactions (`useQuery` / `useMutation`). Optimistic updates live here.
+- `ky` singleton for HTTP. Components never call `ky`. Query owns retries; `ky` retry is `0`.
+- Zustand for complex UI state and explicit state machines. Never a server cache. Never optimistic API writes (overrides the LobeHub Zustand skill).
+- TanStack Form + `nomos` Zod for forms. TanStack Table for grids.
+- View transitions via TanStack Router + `@vercel/react-view-transitions` — not Next.js.
+
+### Naming
+- **Greek:** apps, packages, Nest modules, `iris` feature folders (`dike`, `prometheus`, `astraea`, `argus`, `hermes`, `mnemosyne`).
+- **English GRC:** entities, copy, URLs (`/compliance`, `/risks`).
 
 ---
 
@@ -94,7 +95,7 @@ To avoid collisions or duplicate work across Codex, OpenCode, Cursor, and Antigr
 
 1. **Check Task Board:** Consult `[.agents/tasks/board.md](file:///home/grillo/development/themis/.agents/tasks/board.md)`.
 2. **Acquire Lock:** Run `sh .agents/hooks/pre-task.sh <TASK_ID> <AI_NAME> [TARGET_DIR]`.
-3. **Execute:** Follow the Superpowers workflow (Brainstorm $\to$ Plan $\to$ TDD $\to$ Verify).
+3. **Execute:** Follow the Superpowers workflow (Brainstorm → Plan → TDD → Verify).
 4. **Verify Quality:**
    - Run unit/integration tests (`pnpm test`)
    - Check types (`tsc --noEmit`)
@@ -132,9 +133,9 @@ The persistent memory system bridges sessions across all 4 AI engines:
 | **React Doctor** | `millionco/react-doctor` | React health auditing, performance triage, deslop, similar-function search | All AIs |
 | **Shadcn UI** | `shadcn/ui` | Adding & customizing accessible UI components | Cursor |
 | **Impeccable** | `pbakaus/impeccable` | Design critique, anti-AI-slop aesthetics, typography, polish | Cursor |
-| **TanStack Query** | `tanstack-skills` & `deckardger` | Server state management, query keys, optimistic updates | Codex, Cursor |
-| **Zustand** | `lobehub/lobehub` | Client/UI state slices, selectors, state structures | Cursor, Codex |
+| **TanStack Query / Start / Form / Table / Router** | `tanstack-skills` | Server state, Start host, forms, grids, routing | Codex, Cursor |
+| **Zustand** | `lobehub/lobehub` | Client/UI slices and machines. **Themis override:** no optimistic API writes in stores | Cursor, Codex |
 | **React Best Practices** | `vercel-labs/agent-skills` | React 19 performance, composition, memoization rules | Cursor, Codex |
 | **Web Design Guidelines** | `vercel-labs/agent-skills` | Vercel Web Interface Guidelines & WCAG 2.1 AA audits | Cursor |
-| **View Transitions** | `vercel-labs/agent-skills` | Smooth page & view animations | Cursor |
+| **View Transitions** | `vercel-labs/agent-skills` | Adapt recipes to TanStack Router — do not copy Next.js APIs | Cursor |
 | **Composition Patterns** | `vercel-labs/agent-skills` | Compound components, slots, render props | Cursor, Codex |

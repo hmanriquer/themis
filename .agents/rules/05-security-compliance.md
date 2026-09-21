@@ -29,6 +29,7 @@ Because Themis is an enterprise-grade Governance, Risk, and Compliance platform,
 
 ## 3. Code Security & Secret Management
 
-*   **Zero Hardcoded Credentials:** Never store tokens, API keys, private keys, or passwords in Git or client bundles. Use strongly typed environment variables validated at startup (e.g., Zod schema).
+*   **Zero Hardcoded Credentials:** Never store tokens, API keys, private keys, or passwords in Git or client bundles. Validate environment variables with a Zod schema at startup in both `iris` and `olympus`. Feature code must not read untyped `process.env`.
+*   **Error Envelope:** `olympus` serializes failures as the `@themis/nomos` HTTP error schema (derived from `ThemisError`). `iris` parses that envelope in the `ky` client and surfaces it through TanStack Query error state. Do not invent a second error shape.
 *   **Input Sanitization & Output Encoding:** Sanitize all markdown inputs and rich-text evidence descriptions to prevent Cross-Site Scripting (XSS).
-*   **Strict Typing on Compliance Calculations:** No floating-point rounding quirks on risk formulas; use well-defined integer scales ($1..5$, $1..100$) or decimal value objects.
+*   **Strict Typing on Compliance Calculations:** No floating-point rounding quirks on risk formulas; use well-defined integer scales ($1..5$, $1..100$) or decimal value objects. Those scales are named constants in `nomos` and/or `olympus` domain — never magic numbers in UI.

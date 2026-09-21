@@ -67,6 +67,6 @@ All configuration, instructions, and coordination files are centralized:
 ## 3. Concurrency Protection Rules
 
 1.  **Never edit without a lock:** An agent must never write to code files without checking `.agents/tasks/locks/` or invoking `pre-task.sh`.
-2.  **Granular file locks:** Locks should specify the targeted directory or files (e.g. `src/domain/risk/*`).
+2.  **Granular file locks:** Locks should specify the targeted directory or files (e.g. `apps/olympus/src/prometheus/domain/*`, `apps/iris/src/features/dike/*`).
 3.  **Automatic timeout:** If a lock is older than 2 hours without commit activity, it is considered stale and may be reclaimed after confirmation.
 4.  **Handoff Logging:** Whenever an agent finishes work, it must write a summary entry in `.agents/logs/activity.jsonl` and update `.agents/memory/observations.jsonl`.

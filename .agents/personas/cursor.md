@@ -6,7 +6,7 @@
     *   Building beautiful, responsive, and accessible UI components with Shadcn UI and Tailwind CSS.
     *   Implementing polished view transitions and micro-interactions.
     *   Refactoring messy components into elegant compound components.
-    *   Integrating Zustand stores and TanStack Query hooks into presentational components.
+    *   Integrating feature hooks (TanStack Query) and Zustand machines into **smart** feature components. Routes stay dumb; `shared/ui` primitives stay dumb. Custom hooks live in `hooks/` folders. React files stay ≤ 150 Prettier lines.
     *   Conducting real-time pair programming with the human developer in the editor.
 *   **Preferred Skills:**
     *   `pbakaus/impeccable`: `impeccable`

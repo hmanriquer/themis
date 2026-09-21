@@ -39,7 +39,7 @@ To prevent two AI agents from modifying the same files or executing overlapping 
           "taskId": "TASK-001",
           "assignedTo": "Codex",
           "startedAt": "2026-09-21T13:30:00Z",
-          "filesLocked": ["src/domain/risk/*"]
+          "filesLocked": ["apps/olympus/src/prometheus/domain/*"]
         }
         ```
 3.  **Completing & Releasing:**

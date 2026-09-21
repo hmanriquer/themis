@@ -8,24 +8,16 @@ Themis is an enterprise-grade Governance, Risk, and Compliance (GRC) platform en
 
 ```
                                   +---------------------------------------+
-                                  |       React 19 Presentation Layer     |
-                                  |   (Shadcn UI + View Transitions)      |
+                                  |  iris (TanStack Start presentation)   |
+                                  |  dumb routes · smart features · UI    |
                                   +-------------------+-------------------+
                                                       |
+                                                      | ky + TanStack Query
+                                                      | @themis/nomos DTOs
                                                       v
                                   +---------------------------------------+
-                                  |     State & Data Management Layer     |
-                                  |  - Zustand (Client / Filter / UI)     |
-                                  |  - TanStack Query (Server Caches)     |
-                                  +-------------------+-------------------+
-                                                      |
-                                                      v
-                                  +---------------------------------------+
-                                  |       Application Use Cases Layer     |
-                                  |  - AssessRiskUseCase                  |
-                                  |  - VerifyControlComplianceUseCase     |
-                                  |  - RecordTamperProofAuditEventUseCase |
-                                  |  - GenerateComplianceScorecardUseCase |
+                                  |  olympus (NestJS)                     |
+                                  |  controllers → services → domain      |
                                   +-------------------+-------------------+
                                                       |
                                                       v
@@ -37,11 +29,9 @@ Themis is an enterprise-grade Governance, Risk, and Compliance (GRC) platform en
                                                       |
                                                       v
                                   +---------------------------------------+
-                                  |      Infrastructure Adapters Layer    |
-                                  |  - WebCrypto SHA-256 Signer           |
-                                  |  - IndexedDB / LocalStorage Adapter   |
-                                  |  - Mock Compliance Evidence Ingestor  |
-                                  |  - Audit Export (JSON/CSV/PDF)        |
+                                  |      Infrastructure (Nest providers)  |
+                                  |  - SHA-256 signer · persistence       |
+                                  |  - Evidence ingest · audit export     |
                                   +---------------------------------------+
 ```
 

@@ -6,18 +6,12 @@ You collaborate with **Codex**, **OpenCode**, and **Antigravity**.
 ## Universal Single Source of Truth
 ALL rules, skills, personas, ADRs, documentation, domain knowledge, tasks, logs, and persistent memory reside in the `.agents/` folder:
 
-1. **Clean Code & S.O.L.I.D. Rules:** Always follow `.agents/rules/00-clean-code-solid.md` and `.agents/rules/03-frontend-quality.md`.
-2. **Clean Architecture:** Respect the boundaries in `.agents/rules/02-architecture-grc.md` (Domain -> Application -> Infrastructure -> Presentation).
-3. **Skills:** All modular agent skills are in `.agents/skills/`. Specifically:
-   - Use `impeccable` for design review, spacing, contrast, micro-interactions, avoiding AI slop.
-   - Use `web-design-guidelines` for WCAG 2.1 AA accessibility and Vercel guidelines.
-   - Use `shadcn` for adding and styling components.
-   - Use `zustand` and `tanstack-query` for state management.
-   - Use `react-doctor` before committing code.
-4. **Task Coordination:**
-   - Check `.agents/tasks/board.md` before starting work.
-   - Run `.agents/hooks/pre-task.sh <TASK_ID> Cursor` to acquire a lock.
-   - Run `.agents/hooks/post-task.sh <TASK_ID> Cursor` when complete.
-5. **Memory & Context:**
-   - Read `.agents/memory/index.md` for current project state.
-   - Use `.agents/memory/memory-helper.sh search "<query>"` to look up past context.
+1. **Clean Code & S.O.L.I.D.:** `.agents/rules/00-clean-code-solid.md` (no magic strings/numbers, 150-line React cap, composition).
+2. **Architecture:** `.agents/rules/02-architecture-grc.md` — `iris` / `olympus` / `nomos`. Domain lives in `olympus`; `iris` uses `@themis/nomos` DTOs only.
+3. **Frontend:** `.agents/rules/03-frontend-quality.md` — TanStack Start host, dumb routes / smart feature components / dumb primitives, hooks in `hooks/` folders, TanStack Query for all server interactions, `ky` only in `api/`, Zustand for UI machines only.
+4. **Backend (if touching Nest):** `.agents/rules/06-backend-nestjs.md` — native DI, pantheon module template.
+5. **Tests:** `.agents/rules/04-testing-tdd.md` — colocate unit tests; feature `tests/` is integration-only.
+6. **Skills:** `.agents/skills/`. Use `impeccable`, `web-design-guidelines`, `shadcn`, `zustand` (Themis override: no optimistic API writes in stores), `tanstack-query`, `react-doctor`. Adapt view-transition recipes to TanStack Router — do not copy Next.js APIs.
+7. **Task Coordination:** Check `.agents/tasks/board.md`. Run `.agents/hooks/pre-task.sh <TASK_ID> Cursor` before edits. Run `.agents/hooks/post-task.sh <TASK_ID> Cursor` when complete.
+8. **Memory:** `.agents/memory/index.md` and `.agents/memory/memory-helper.sh search "<query>"`.
+9. **Spec:** `docs/superpowers/specs/2026-09-21-project-rules-hardening-design.md`.

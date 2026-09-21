@@ -8,7 +8,7 @@ This directory holds transient lock files created by the 4 AI agents before edit
   "taskId": "TASK-002",
   "assignedTo": "Codex",
   "startedAt": "2026-09-21T13:40:00Z",
-  "filesLocked": ["src/domain/*"]
+  "filesLocked": ["apps/olympus/src/prometheus/domain/*"]
 }
 ```
 

@@ -7,8 +7,12 @@ alwaysApply: true
 # Cursor Rule: Themis Shared AI Layer
 
 - **Shared State Directory:** `.agents/`
-- **Core Guidelines:** Follow Clean Architecture, S.O.L.I.D., and Clean Code standards located in `.agents/rules/`.
-- **UI & Aesthetics:** Adhere to `impeccable` design guardrails and `web-design-guidelines`. Avoid generic AI styling.
-- **State Separation:** Server state belongs exclusively in TanStack Query; UI state belongs in Zustand feature slices; route filters belong in URL params.
-- **Skills:** Loaded directly from `.agents/skills/`.
+- **Spec:** `docs/superpowers/specs/2026-09-21-project-rules-hardening-design.md`
+- **Core Guidelines:** Clean Architecture, S.O.L.I.D., and Clean Code in `.agents/rules/` (`00`, `02`, `03`, `04`, `06`).
+- **Workspaces:** `apps/iris` (TanStack Start host), `apps/olympus` (NestJS), `packages/nomos` (Zod contracts).
+- **UI & Aesthetics:** `impeccable` and `web-design-guidelines`. Avoid generic AI styling.
+- **UI layers:** Routes are dumb; feature components are smart; `shared/ui` primitives are dumb. Custom hooks live in `hooks/` folders. React files ≤ 150 Prettier lines.
+- **State Separation:** Server interactions belong exclusively in TanStack Query (`ky` only inside feature `api/`). Zustand is for UI machines only — never a server cache or optimistic API writes. Filters belong in URL params.
+- **Naming:** Greek for apps/packages/modules/features; English GRC for entities, copy, and URLs.
+- **Skills:** Loaded directly from `.agents/skills/`. View transitions via TanStack Router, not Next.js.
 - **Coordination:** Respect task locks in `.agents/tasks/locks/`.
